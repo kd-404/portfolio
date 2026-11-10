@@ -123,6 +123,7 @@
     padding-block:max(90px, 10vh) 54px;
     border-bottom:1px solid var(--line-soft);
     overflow:hidden;
+    perspective:1100px;
   }
   .hero-grid{
     display:grid;grid-template-columns:1.1fr 0.9fr;align-items:center;gap:40px;
@@ -134,6 +135,12 @@
   }
   .hero-media-frame{
     position:relative;z-index:2;order:2;
+    transform-style:preserve-3d;
+    transform-origin:50% 40%;
+    will-change:transform;
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .hero-media-frame{transition:transform .05s linear}
   }
   @media (max-width:820px){ .hero-media-frame{max-width:340px;margin-inline:auto;order:-1} }
   .hero-media{
@@ -146,8 +153,8 @@
     mask-composite:intersect;
   }
   .hero-media img{
-    width:100%;height:100%;object-fit:cover;object-position:50% 20%;
-    transform:scale(1.2);
+    width:100%;height:100%;object-fit:cover;object-position:50% 18%;
+    transform:scale(1.32);
     filter:grayscale(1) contrast(1.2) brightness(0.82);
   }
   .hero-media::after{
@@ -292,7 +299,7 @@
   .edu-item .score{font-family:var(--mono);font-size:0.78rem;color:var(--accent);white-space:nowrap;text-shadow:0 0 8px var(--accent-dim)}
 
   /* ---------- Certifications ---------- */
-  .cert-list{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
+  .cert-list{display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
   @media (max-width:680px){.cert-list{grid-template-columns:1fr}}
   .cert{position:relative;padding:22px 24px;background:var(--bg-raised);display:flex;gap:18px;align-items:flex-start}
   .cert .badge{width:40px;height:40px;flex:none;margin-top:2px}
@@ -335,6 +342,90 @@
   @media (max-width:420px){
     .hero{min-height:84vh}
   }
+
+  /* ---------- Kacy chatbot ---------- */
+  #kacy-launcher{
+    position:fixed;z-index:20;
+    right:max(18px, env(safe-area-inset-right,0px));
+    bottom:max(18px, env(safe-area-inset-bottom,0px));
+    width:64px;height:64px;border:none;background:none;padding:0;cursor:pointer;
+  }
+  #kacy-launcher svg{width:100%;height:100%;overflow:visible}
+  #kacy-launcher .ufo-float{transform-origin:50% 50%}
+  @media (prefers-reduced-motion: no-preference){
+    #kacy-launcher .ufo-float{animation:ufo-bob 3.4s ease-in-out infinite}
+    #kacy-launcher .ufo-beam{animation:ufo-beam 3.4s ease-in-out infinite}
+  }
+  @keyframes ufo-bob{
+    0%,100%{transform:translateY(0) rotate(-2deg)}
+    50%{transform:translateY(-7px) rotate(2deg)}
+  }
+  @keyframes ufo-beam{
+    0%,100%{opacity:0.25}
+    50%{opacity:0.55}
+  }
+  #kacy-launcher .ping{
+    position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;
+    background:var(--accent2);box-shadow:0 0 8px var(--accent2);
+  }
+
+  #kacy-panel{
+    position:fixed;z-index:21;
+    right:max(18px, env(safe-area-inset-right,0px));
+    bottom:max(90px, calc(env(safe-area-inset-bottom,0px) + 90px));
+    width:min(340px, calc(100vw - 36px));
+    max-height:min(480px, 70vh);
+    display:flex;flex-direction:column;
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    box-shadow:0 24px 60px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(45,232,208,0.06);
+    opacity:0;transform:translateY(16px) scale(0.98);pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease;
+  }
+  #kacy-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+  #kacy-head{
+    display:flex;align-items:center;gap:10px;padding:14px 14px;
+    border-bottom:1px solid var(--line-soft);background:var(--bg-raised2);
+  }
+  #kacy-head .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  #kacy-head .ttl{font-family:var(--mono);font-size:0.78rem;letter-spacing:0.06em;color:var(--fg)}
+  #kacy-head .sub{font-family:var(--mono);font-size:0.62rem;color:var(--fg-faint);margin-top:1px}
+  #kacy-close{
+    margin-left:auto;background:none;border:1px solid var(--line-soft);color:var(--fg-faint);
+    width:24px;height:24px;cursor:pointer;font-family:var(--mono);font-size:0.78rem;border-radius:2px;
+  }
+  #kacy-close:hover{color:var(--accent);border-color:var(--line)}
+  #kacy-log{
+    flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;
+    font-size:0.88rem;line-height:1.5;
+  }
+  #kacy-log .msg{max-width:88%;padding:8px 11px;border-radius:2px}
+  #kacy-log .msg.bot{background:var(--bg-raised2);border:1px solid var(--line-soft);color:var(--fg)}
+  #kacy-log .msg.user{align-self:flex-end;background:rgba(45,232,208,0.1);border:1px solid var(--line);color:var(--fg)}
+  #kacy-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+  #kacy-chips button{
+    font-family:var(--mono);font-size:0.66rem;letter-spacing:0.02em;
+    padding:5px 10px;border:1px solid var(--line);border-radius:2px;color:var(--fg-muted);
+    background:rgba(45,232,208,0.04);cursor:pointer;transition:background .2s,color .2s;
+  }
+  #kacy-chips button:hover{background:rgba(45,232,208,0.1);color:var(--accent)}
+  #kacy-input-row{
+    display:flex;gap:8px;padding:12px;border-top:1px solid var(--line-soft);background:var(--bg-raised2);
+  }
+  #kacy-input{
+    flex:1;min-width:0;background:var(--bg-raised);border:1px solid var(--line-soft);color:var(--fg);
+    font-family:var(--body);font-size:0.86rem;padding:8px 10px;border-radius:2px;
+  }
+  #kacy-input:focus{outline:none;border-color:var(--line)}
+  #kacy-send{
+    font-family:var(--mono);font-size:0.72rem;color:var(--accent);
+    background:none;border:1px solid var(--line);border-radius:2px;padding:0 14px;cursor:pointer;
+  }
+  #kacy-send:hover{background:rgba(45,232,208,0.1)}
+  @media (max-width:420px){
+    #kacy-panel{right:12px;bottom:84px;width:calc(100vw - 24px)}
+    #kacy-launcher{right:12px;bottom:12px}
+  }
 </style>
 
 <div id="atmo"></div>
@@ -366,7 +457,7 @@
       <div class="role">AI/ML ENGINEER building <b>LLMs</b>, <b>RAG</b> &amp; <b>agentic systems</b> from first principles<span class="cursor"></span></div>
       <div class="hero-meta">
         <span><b>Based</b><span class="val">Coimbatore, India</span></span>
-        <span><b>Focus</b><span class="val">LLM pretraining · multi-agent orchestration</span></span>
+        <span><b>Focus</b><span class="val">LLM pretraining · agentic orchestration · applied ML</span></span>
         <span><b>Status</b><span class="val">Open to AI engineer / FDE roles</span></span>
       </div>
     </div>
@@ -388,19 +479,19 @@
       <span class="rule"></span>
     </div>
     <div class="about-grid">
-      <p class="lead">I bring an evidence-driven, detail-first approach to AI system design: measuring hallucination rate, citation faithfulness, and failure modes rather than assuming a model works because it runs. I work across the full stack of a modern AI system — model internals, retrieval, and multi-agent orchestration — building architectures from the paper up and evaluating them rigorously before calling them done.</p>
+      <p class="lead">I design and ship agentic AI systems end to end — model internals, retrieval, and multi-agent orchestration — and I hold every one of them to the same bar: measured, not assumed. That means hallucination rate and citation faithfulness benchmarked across quantization levels, guardrails and access scoping built into an agent from day one instead of bolted on after, and cost/latency tradeoffs backed by numbers instead of guesses. I'm comfortable reading an unfamiliar problem fast and designing the architecture that actually fits it, rather than defaulting to "put an agent on everything."</p>
       <div class="stat-list">
         <div class="stat">
-          <div class="v">4+</div>
-          <div class="l">AI systems built end-to-end, solo</div>
+          <div class="v">6+</div>
+          <div class="l">Agentic &amp; ML systems designed and shipped solo</div>
         </div>
         <div class="stat">
-          <div class="v">LLM · RAG · CV</div>
-          <div class="l">Core domains across modeling, retrieval, vision</div>
+          <div class="v">0.977</div>
+          <div class="l">ROC-AUC on a medical-imaging screening classifier</div>
         </div>
         <div class="stat">
-          <div class="v">Eval-first</div>
-          <div class="l">Every model benchmarked before it ships</div>
+          <div class="v">7.8×</div>
+          <div class="l">Grounded-QA accuracy gain from one output-format redesign</div>
         </div>
       </div>
     </div>
@@ -413,6 +504,137 @@
       <span class="rule"></span>
     </div>
     <div class="projects">
+
+      <div class="project">
+        <div class="thumb">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" fill="#07080a"/>
+            <circle cx="14" cy="60" r="5" fill="#2de8d0"/>
+            <path d="M14 60 H34" stroke="#2de8d0" stroke-opacity="0.5" stroke-width="1.5"/>
+            <path d="M34 60 L58 20" stroke="#2de8d0" stroke-opacity="0.75" stroke-width="1.5" fill="none"/>
+            <path d="M34 60 L58 46" stroke="#ff3d6e" stroke-opacity="0.8" stroke-width="1.5" fill="none"/>
+            <path d="M34 60 L58 74" stroke="#2de8d0" stroke-opacity="0.45" stroke-width="1.5" fill="none"/>
+            <path d="M34 60 L58 100" stroke="#2de8d0" stroke-opacity="0.3" stroke-width="1.5" fill="none" stroke-dasharray="2 3"/>
+            <rect x="58" y="13" width="48" height="14" fill="none" stroke="#2de8d0" stroke-opacity="0.7"/>
+            <text x="82" y="22.5" font-family="monospace" font-size="7" fill="#2de8d0" text-anchor="middle">HOT 98%</text>
+            <rect x="58" y="39" width="48" height="14" fill="none" stroke="#ff3d6e" stroke-opacity="0.85"/>
+            <text x="82" y="48.5" font-family="monospace" font-size="7" fill="#ff3d6e" text-anchor="middle">GRAY ~1%</text>
+            <rect x="58" y="67" width="48" height="14" fill="none" stroke="#2de8d0" stroke-opacity="0.45"/>
+            <text x="82" y="76.5" font-family="monospace" font-size="6.2" fill="#2de8d0" fill-opacity="0.8" text-anchor="middle">VERIFY</text>
+            <rect x="58" y="93" width="48" height="14" fill="none" stroke="#2de8d0" stroke-opacity="0.25" stroke-dasharray="2 2"/>
+            <text x="82" y="102.5" font-family="monospace" font-size="6.2" fill="#2de8d0" fill-opacity="0.5" text-anchor="middle">LEARN</text>
+          </svg>
+        </div>
+        <div>
+          <span class="idx">001</span>
+          <span class="tag">ML + LLM-agent · fraud</span>
+        </div>
+        <div>
+          <h3>Fraud Analyser</h3>
+          <p class="desc">A four-lane fraud-detection architecture for UPI/IMPS/card payments, built after routing every transaction through an LLM agent proved too slow and too expensive at bank scale. A gradient-boosting model scores every transaction in a hot lane; an LLM agent investigates only the ambiguous ~1% in a gray-zone lane; a verification lane confirms high-risk payments. A privacy gateway pseudonymizes identifiers before anything reaches the LLM, and a compact encoder compresses each case from ~457 tokens to ~25 before it hits the agent. On held-out synthetic data: 0.76 precision / 0.94 recall at a fixed 0.1% false-positive rate, with 98.35% of transactions never leaving the hot lane.</p>
+          <div class="stack">
+            <span class="chip">Gradient boosting</span><span class="chip">Azure AI Foundry</span><span class="chip">Agentic routing</span><span class="chip">Token compression</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="thumb">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" fill="#07080a"/>
+            <rect x="10" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.85"/>
+            <rect x="20" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.7"/>
+            <rect x="30" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.85"/>
+            <rect x="40" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.6"/>
+            <rect x="50" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.8"/>
+            <rect x="60" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.65"/>
+            <rect x="70" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.75"/>
+            <rect x="80" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.55"/>
+            <rect x="90" y="22" width="8" height="10" fill="#2de8d0" fill-opacity="0.7"/>
+            <text x="12" y="46" font-family="monospace" font-size="7" fill="#8b9196">~457 tok</text>
+            <path d="M54 56 L66 70" stroke="#ff3d6e" stroke-width="1.5"/>
+            <path d="M66 56 L54 70" stroke="#ff3d6e" stroke-width="1.5"/>
+            <rect x="46" y="84" width="10" height="12" fill="#2de8d0" fill-opacity="0.9"/>
+            <rect x="58" y="84" width="10" height="12" fill="#ff3d6e" fill-opacity="0.6"/>
+            <text x="46" y="105" font-family="monospace" font-size="7" fill="#2de8d0">~25 tok</text>
+          </svg>
+        </div>
+        <div>
+          <span class="idx">002</span>
+          <span class="tag">Open-source · protocol layer</span>
+        </div>
+        <div>
+          <h3>Agent I/O Compression Layer</h3>
+          <p class="desc">An open-source (MIT) middleware layer for high-volume, repetitive agentic workloads — fraud or compliance pass/fail checks, for example. It sits between an application and its LLM agent, replacing verbose JSON payloads and raw identifiers with short aliases and derived signals on the input side, and compact reason codes expanded locally on the output side. In internal testing: ~50–70% fewer input tokens and ~60–75% fewer output tokens per request, with no loss of decision information at the protocol layer.</p>
+          <div class="stack">
+            <span class="chip">Token efficiency</span><span class="chip">Agent protocol design</span><span class="chip">Open source</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="thumb">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" fill="#07080a"/>
+            <g stroke="#2de8d0" stroke-opacity="0.35">
+              <line x1="16" y1="10" x2="16" y2="110"/>
+              <line x1="34" y1="10" x2="34" y2="110"/>
+              <line x1="52" y1="10" x2="52" y2="110"/>
+              <line x1="70" y1="10" x2="70" y2="110"/>
+              <line x1="88" y1="10" x2="88" y2="110"/>
+              <line x1="106" y1="10" x2="106" y2="110"/>
+            </g>
+            <g stroke="#ff3d6e" stroke-opacity="0.5">
+              <line x1="10" y1="24" x2="112" y2="24"/>
+              <line x1="10" y1="48" x2="112" y2="48"/>
+              <line x1="10" y1="72" x2="112" y2="72"/>
+              <line x1="10" y1="96" x2="112" y2="96"/>
+            </g>
+            <circle cx="34" cy="24" r="3.5" fill="#2de8d0"/>
+            <circle cx="70" cy="48" r="3.5" fill="#2de8d0"/>
+            <circle cx="52" cy="72" r="3.5" fill="#ff3d6e"/>
+            <circle cx="88" cy="96" r="3.5" fill="#2de8d0"/>
+          </svg>
+        </div>
+        <div>
+          <span class="idx">003</span>
+          <span class="tag">Multi-agent · production</span>
+        </div>
+        <div>
+          <h3>Loomwell</h3>
+          <p class="desc">An end-to-end multi-agent AI system, built on Azure AI Foundry, that runs the operations of a textile business — orchestrated agents sitting over a web and database layer, deployed as a live production product rather than a prototype.</p>
+          <div class="stack">
+            <span class="chip">Azure AI Foundry</span><span class="chip">Multi-agent orchestration</span><span class="chip">Production deployment</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project">
+        <div class="thumb">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" fill="#07080a"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#2de8d0" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 4"/>
+            <circle cx="60" cy="60" r="30" fill="none" stroke="#2de8d0" stroke-opacity="0.45" stroke-width="1"/>
+            <circle cx="60" cy="52" r="11" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1.5"/>
+            <circle cx="55" cy="50" r="1.6" fill="#2de8d0"/>
+            <circle cx="65" cy="50" r="1.6" fill="#2de8d0"/>
+            <path d="M46 70 Q60 80 74 70" stroke="#ff3d6e" stroke-width="1.5" fill="none"/>
+            <path d="M34 60 A26 26 0 0 1 60 34" stroke="#ff3d6e" stroke-opacity="0.7" stroke-width="1.5" fill="none"/>
+            <circle cx="60" cy="34" r="2.2" fill="#ff3d6e"/>
+          </svg>
+        </div>
+        <div>
+          <span class="idx">004</span>
+          <span class="tag">Agentic RAG · assistant</span>
+        </div>
+        <div>
+          <h3>Kacy</h3>
+          <p class="desc">An enterprise agentic assistant wrapping GPT-4o-mini in a production-style pipeline designed around guardrails from the start: every request is access-scoped before it runs, retrieval grounds answers in company data instead of the model's memory, and six tool integrations (email, calendar, HR, docs, approvals) execute only after human-in-the-loop approval — the whole flow traced and gated by an eval suite in CI/CD. The little mascot guiding this site is named after her.</p>
+          <div class="stack">
+            <span class="chip">Agentic RAG</span><span class="chip">Azure AI Search</span><span class="chip">Guardrail design</span><span class="chip">MCP tools</span>
+          </div>
+        </div>
+      </div>
 
       <div class="project">
         <div class="thumb">
@@ -431,96 +653,14 @@
           </svg>
         </div>
         <div>
-          <span class="idx">001</span>
+          <span class="idx">005</span>
           <span class="tag">RAG · search</span>
         </div>
         <div>
           <h3>ZeroMem</h3>
-          <p class="desc">A fully local, Perplexity-style search-and-answer engine running entirely on an 8GB M2 Mac. A from-scratch 20M-parameter transformer sits over a web-search RAG pipeline with a dedicated citation verifier, backed by a quantized Qwen2.5-3B production layer. Benchmarked hallucination and citation faithfulness across FP16, Q8, and Q4 quantization.</p>
+          <p class="desc">A fully local, Perplexity-style search-and-answer engine running entirely on an 8GB M2 Mac. A 34M-parameter transformer, trained from scratch in PyTorch with a custom chunk-isolated attention mechanism for multi-source reading (perplexity 4.9 on held-out data), sits over a BraveSearch RAG pipeline alongside a quantized Qwen2.5-3B production layer. Redesigning the model's output format lifted grounded-QA accuracy from 10% to 78% on held-out evaluation, and hallucination/citation faithfulness is benchmarked across FP16, Q8, and Q4 quantization.</p>
           <div class="stack">
-            <span class="chip">PyTorch</span><span class="chip">Transformers</span><span class="chip">RAG</span><span class="chip">Quantization</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project">
-        <div class="thumb">
-          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="120" height="120" fill="#07080a"/>
-            <g>
-              <rect x="10" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.85"/>
-              <rect x="24" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.25"/>
-              <rect x="38" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.5"/>
-              <rect x="52" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.15"/>
-              <rect x="66" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.65"/>
-              <rect x="80" y="10" width="12" height="12" fill="#2de8d0" fill-opacity="0.1"/>
-              <rect x="94" y="10" width="12" height="12" fill="#ff3d6e" fill-opacity="0.4"/>
-              <rect x="10" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.3"/>
-              <rect x="24" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.9"/>
-              <rect x="38" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.2"/>
-              <rect x="52" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.55"/>
-              <rect x="66" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.1"/>
-              <rect x="80" y="24" width="12" height="12" fill="#ff3d6e" fill-opacity="0.5"/>
-              <rect x="94" y="24" width="12" height="12" fill="#2de8d0" fill-opacity="0.3"/>
-              <rect x="10" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.15"/>
-              <rect x="24" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.45"/>
-              <rect x="38" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.95"/>
-              <rect x="52" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.2"/>
-              <rect x="66" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.6"/>
-              <rect x="80" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.1"/>
-              <rect x="94" y="38" width="12" height="12" fill="#2de8d0" fill-opacity="0.4"/>
-              <rect x="10" y="52" width="12" height="12" fill="#ff3d6e" fill-opacity="0.35"/>
-              <rect x="24" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.2"/>
-              <rect x="38" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.5"/>
-              <rect x="52" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.95"/>
-              <rect x="66" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.15"/>
-              <rect x="80" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.55"/>
-              <rect x="94" y="52" width="12" height="12" fill="#2de8d0" fill-opacity="0.1"/>
-            </g>
-          </svg>
-        </div>
-        <div>
-          <span class="idx">002</span>
-          <span class="tag">LLM · internals</span>
-        </div>
-        <div>
-          <h3>Py-GPT</h3>
-          <p class="desc">A GPT-style language model built end-to-end in Python — custom tokenizer, transformer, and training loop written from scratch to study attention internals directly. Later extended to load frozen pretrained weights into the self-built architecture and debug inference under non-standard attention and decoding schemes.</p>
-          <div class="stack">
-            <span class="chip">Python</span><span class="chip">Transformer architecture</span><span class="chip">Tokenization</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project">
-        <div class="thumb">
-          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="120" height="120" fill="#07080a"/>
-            <line x1="60" y1="60" x2="22" y2="28" stroke="#2de8d0" stroke-opacity="0.4" stroke-width="1"/>
-            <line x1="60" y1="60" x2="96" y2="24" stroke="#2de8d0" stroke-opacity="0.4" stroke-width="1"/>
-            <line x1="60" y1="60" x2="18" y2="90" stroke="#2de8d0" stroke-opacity="0.4" stroke-width="1"/>
-            <line x1="60" y1="60" x2="98" y2="94" stroke="#2de8d0" stroke-opacity="0.4" stroke-width="1"/>
-            <line x1="60" y1="60" x2="60" y2="14" stroke="#ff3d6e" stroke-opacity="0.35" stroke-width="1"/>
-            <line x1="22" y1="28" x2="60" y2="14" stroke="#2de8d0" stroke-opacity="0.15" stroke-width="1"/>
-            <line x1="96" y1="24" x2="60" y2="14" stroke="#2de8d0" stroke-opacity="0.15" stroke-width="1"/>
-            <circle cx="60" cy="60" r="9" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1.5"/>
-            <circle cx="60" cy="60" r="3" fill="#2de8d0"/>
-            <circle cx="22" cy="28" r="5" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1"/>
-            <circle cx="96" cy="24" r="5" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1"/>
-            <circle cx="18" cy="90" r="5" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1"/>
-            <circle cx="98" cy="94" r="5" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1"/>
-            <circle cx="60" cy="14" r="4" fill="#0a0a0d" stroke="#ff3d6e" stroke-width="1"/>
-          </svg>
-        </div>
-        <div>
-          <span class="idx">003</span>
-          <span class="tag">Multi-agent · orchestration</span>
-        </div>
-        <div>
-          <h3>Company OS</h3>
-          <p class="desc">A LangChain-based multi-agent framework that autonomously runs a company's departments — prototyped on a T-shirt company — including a dedicated design agent and an n8n-style live dashboard that visualizes agent activity in real time.</p>
-          <div class="stack">
-            <span class="chip">LangChain</span><span class="chip">Multi-agent orchestration</span><span class="chip">Dashboarding</span>
+            <span class="chip">PyTorch</span><span class="chip">Transformers from scratch</span><span class="chip">RAG</span><span class="chip">Quantization</span>
           </div>
         </div>
       </div>
@@ -543,14 +683,14 @@
           </svg>
         </div>
         <div>
-          <span class="idx">004</span>
+          <span class="idx">006</span>
           <span class="tag">Computer vision · medical</span>
         </div>
         <div>
           <h3>OncoScan</h3>
-          <p class="desc">A convolutional neural network trained on histopathology images to flag early-stage malignant cells. Augmentation and class-imbalance handling were tuned specifically to maximize recall and minimize false negatives in a screening context.</p>
+          <p class="desc">A recall-optimized ResNet-18 for lymph node metastasis detection on H&amp;E histopathology patches (PatchCamelyon), reaching 0.977 ROC-AUC and 0.950 recall — on par with the published PCam benchmark range. Its decision threshold is auto-tuned to ≥95% sensitivity to match clinical screening standards, with Grad-CAM explainability and a Gradio inference UI.</p>
           <div class="stack">
-            <span class="chip">CNN</span><span class="chip">Medical imaging</span><span class="chip">Class imbalance</span>
+            <span class="chip">ResNet</span><span class="chip">Medical imaging</span><span class="chip">Grad-CAM</span><span class="chip">Threshold tuning</span>
           </div>
         </div>
       </div>
@@ -566,27 +706,34 @@
     </div>
     <div class="skill-groups">
       <div class="skill-group">
-        <div class="eyebrow">Modeling</div>
+        <div class="eyebrow">LLM Engineering</div>
         <ul>
-          <li>LLM pretraining &amp; fine-tuning</li>
+          <li>Pretraining &amp; fine-tuning (from scratch and LoRA)</li>
           <li>Transformer architecture design</li>
           <li>Model quantization (FP16/Q8/Q4)</li>
+          <li>Token-efficient protocol design</li>
+          <li>Model evaluation &amp; benchmarking</li>
         </ul>
       </div>
       <div class="skill-group">
-        <div class="eyebrow">Systems</div>
+        <div class="eyebrow">Agentic Systems</div>
         <ul>
-          <li>RAG pipelines</li>
           <li>Multi-agent orchestration</li>
+          <li>RAG pipelines</li>
+          <li>Azure AI Foundry Agent Service</li>
           <li>LangChain</li>
+          <li>Human-in-the-loop &amp; guardrail design</li>
+          <li>MCP / tool integration</li>
         </ul>
       </div>
       <div class="skill-group">
-        <div class="eyebrow">Tooling</div>
+        <div class="eyebrow">Applied ML &amp; Infra</div>
         <ul>
-          <li>PyTorch</li>
-          <li>Python &amp; Bash</li>
-          <li>Linux</li>
+          <li>Gradient boosting &amp; model calibration</li>
+          <li>CNNs (ResNet), class-imbalance handling</li>
+          <li>Explainability (Grad-CAM)</li>
+          <li>Azure Cloud, Azure AI Search</li>
+          <li>Python, SQL, Git</li>
         </ul>
       </div>
     </div>
@@ -645,6 +792,43 @@
           <div class="issuer">Course AI-103T00</div>
         </div>
       </div>
+
+      <div class="cert">
+        <svg class="badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Certified Ethical Hacker">
+          <defs>
+            <linearGradient id="cehG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2de8d0"/>
+              <stop offset="1" stop-color="#107a6e"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 1.6 20.5 5v6.2c0 5-3.6 8.9-8.5 11.2-4.9-2.3-8.5-6.2-8.5-11.2V5z" fill="url(#cehG)" fill-opacity="0.9"/>
+          <path d="M8.2 12.3 10.8 15l5-6" fill="none" stroke="#06100e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="eyebrow">EC-Council</div>
+          <h3>Certified Ethical Hacker (CEH)</h3>
+          <div class="issuer">Offensive-security foundation behind the guardrail &amp; access-control work in my agentic systems</div>
+        </div>
+      </div>
+
+      <div class="cert">
+        <svg class="badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Forward Deployed Engineer">
+          <defs>
+            <linearGradient id="fdeG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff3d6e"/>
+              <stop offset="1" stop-color="#8a1537"/>
+            </linearGradient>
+          </defs>
+          <rect x="2" y="4" width="20" height="14" rx="1.5" fill="none" stroke="url(#fdeG)" stroke-width="1.6"/>
+          <path d="M6 9 L10 12 L6 15" fill="none" stroke="#ff3d6e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="15" x2="18" y2="15" stroke="#ff3d6e" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div class="eyebrow">Udemy · 2026</div>
+          <h3>Forward Deployed Engineer</h3>
+          <div class="issuer">Client-facing delivery &amp; implementation track</div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -684,6 +868,48 @@
 
 </div>
 
+<button id="kacy-launcher" aria-label="Open Kacy chat" aria-haspopup="dialog" aria-expanded="false" aria-controls="kacy-panel">
+  <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="ufo-beam" cx="32" cy="52" rx="14" ry="6" fill="#2de8d0" fill-opacity="0.35"/>
+    <g class="ufo-float">
+      <ellipse cx="32" cy="34" rx="22" ry="7" fill="#101014" stroke="#2de8d0" stroke-width="1.4"/>
+      <ellipse cx="32" cy="32" rx="26" ry="4.4" fill="#0a0a0d" stroke="#2de8d0" stroke-opacity="0.6" stroke-width="1"/>
+      <circle cx="18" cy="34" r="1.6" fill="#ff3d6e"/>
+      <circle cx="32" cy="35.5" r="1.6" fill="#2de8d0"/>
+      <circle cx="46" cy="34" r="1.6" fill="#ff3d6e"/>
+      <path d="M21 28 A11 13 0 0 1 43 28 Z" fill="#0a0a0d" stroke="#2de8d0" stroke-width="1.3"/>
+      <ellipse cx="32" cy="25" rx="7" ry="8" fill="#13241f"/>
+      <ellipse cx="29" cy="24" rx="2.1" ry="2.6" fill="#2de8d0"/>
+      <ellipse cx="35.5" cy="24" rx="2.1" ry="2.6" fill="#2de8d0"/>
+    </g>
+  </svg>
+  <span class="ping"></span>
+</button>
+
+<div id="kacy-panel" role="dialog" aria-label="Chat with Kacy">
+  <div id="kacy-head">
+    <span class="dot"></span>
+    <div>
+      <div class="ttl">KACY</div>
+      <div class="sub">scripted guide · ask about Balaji</div>
+    </div>
+    <button id="kacy-close" aria-label="Close chat">✕</button>
+  </div>
+  <div id="kacy-log"></div>
+  <div id="kacy-chips">
+    <button data-topic="hobbies">Hobbies</button>
+    <button data-topic="skills">Skills</button>
+    <button data-topic="projects">Projects</button>
+    <button data-topic="certs">Certs</button>
+    <button data-topic="contact">Contact</button>
+    <button data-topic="random">Surprise me</button>
+  </div>
+  <div id="kacy-input-row">
+    <input id="kacy-input" type="text" placeholder="Ask Kacy something…" autocomplete="off">
+    <button id="kacy-send">SEND</button>
+  </div>
+</div>
+
 <script>
   // Copy buttons
   document.querySelectorAll('.copy').forEach(function(btn){
@@ -701,6 +927,184 @@
       }
     });
   });
+
+  // Kacy chatbot — scripted, keyword-matched, no backend
+  (function(){
+    var launcher = document.getElementById('kacy-launcher');
+    var panel = document.getElementById('kacy-panel');
+    var closeBtn = document.getElementById('kacy-close');
+    var log = document.getElementById('kacy-log');
+    var input = document.getElementById('kacy-input');
+    var sendBtn = document.getElementById('kacy-send');
+    var chips = document.querySelectorAll('#kacy-chips button');
+    if (!launcher || !panel) return;
+
+    var topics = {
+      hobbies: {
+        keywords: ['hobby','hobbies','free time','fun','interest','spare time','outside of work','weekend'],
+        replies: [
+          "Outside of shipping agentic systems, he's on a modeling journey — real studio photoshoots, not the machine-learning kind of modeling.",
+          "Most of his 'hobbies' are just more AI systems. He builds things like me for fun, not only for job applications.",
+          "He reads ML papers the way other people read novels. Quantization and RAG-faithfulness papers, specifically — make of that what you will."
+        ]
+      },
+      skills: {
+        keywords: ['skill','skills','stack','tech stack','technology','tools','expertise','good at'],
+        replies: [
+          "Three buckets, really: LLM engineering (pretraining, fine-tuning, quantization), agentic systems (multi-agent orchestration, RAG, guardrails, MCP tools), and applied ML (gradient boosting, CNNs, explainability). Python end to end.",
+          "Scroll to the Skills section for the full breakdown — short version: he builds the model, the pipeline around it, and the eval that proves it works."
+        ]
+      },
+      projects: {
+        keywords: ['project','projects','built','build','portfolio','what has he made','what did he build'],
+        replies: [
+          "Six worth knowing: Fraud Analyser, the Agent I/O Compression Layer, Loomwell, me (Kacy), ZeroMem, and OncoScan. Scroll up to Selected Work for details, or ask me about one by name."
+        ]
+      },
+      zeromem: {
+        keywords: ['zeromem','zero mem','perplexity clone'],
+        replies: ["ZeroMem is a local Perplexity-style search engine running entirely on an 8GB Mac — a from-scratch 34M-parameter transformer plus a quantized production model, with hallucination and citation faithfulness benchmarked across FP16/Q8/Q4."]
+      },
+      fraud: {
+        keywords: ['fraud','fraud analyser','fraud detection'],
+        replies: ["Fraud Analyser is a four-lane fraud-detection system for UPI/IMPS/card payments — a fast gradient-boosting model handles 98%+ of transactions, and an LLM agent only steps in for the ambiguous ~1%."]
+      },
+      loomwell: {
+        keywords: ['loomwell'],
+        replies: ["Loomwell is a live, production multi-agent system on Azure AI Foundry that runs a textile business's operations end to end."]
+      },
+      oncoscan: {
+        keywords: ['oncoscan','cancer','medical imaging','histopathology'],
+        replies: ["OncoScan is a ResNet-18 classifier for lymph node metastasis detection — 0.977 ROC-AUC, tuned to ≥95% sensitivity for clinical screening standards."]
+      },
+      compression: {
+        keywords: ['compression','agent i/o','token compression','encoding'],
+        replies: ["The Agent I/O Compression Layer is an open-source (MIT) middleware that cuts token usage ~50-75% on repetitive agent workloads, with zero loss of decision information."]
+      },
+      certs: {
+        keywords: ['cert','certs','certification','certifications','ceh','azure cert','fde cert'],
+        replies: ["Certified Ethical Hacker (EC-Council), Microsoft's Develop AI Apps and Agents on Azure, and a Forward Deployed Engineer track from Udemy."]
+      },
+      contact: {
+        keywords: ['contact','email','reach','hire','linkedin','github','phone','get in touch'],
+        replies: ["balaji.cyberlabs@gmail.com · linkedin.com/in/balajikd · github.com/kd-404 — or just scroll down to Contact."]
+      },
+      kacy: {
+        keywords: ['kacy','who are you','what are you','your name'],
+        replies: ["I'm Kacy — or rather, a scripted stand-in for her. The real Kacy is an enterprise agentic assistant Balaji built with guardrails and access control baked in from day one. I'm the lightweight, no-backend version, just here to answer questions about him."]
+      },
+      random: {
+        keywords: [],
+        replies: [
+          "Fun fact: ZeroMem's accuracy jumped 7.8x from redesigning the output format alone — no new data, no bigger model.",
+          "He named his enterprise assistant Kacy, then named me after her. It's assistants all the way down.",
+          "He's actively trying to get into an AI engineer or Forward Deployed Engineer role — if that's you reading this, the Contact section is right below."
+        ]
+      }
+    };
+
+    var fallbacks = [
+      "That one's outside my script. Try hobbies, skills, projects, certs, or contact.",
+      "Not in my knowledge base — but honestly, neither is most of the internet. Ask me something on the chip list.",
+      "I'm scripted, not a reasoning model, so I only know a handful of topics about Balaji. Pick one below?"
+    ];
+
+    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function addMsg(text, who){
+      var div = document.createElement('div');
+      div.className = 'msg ' + who;
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function respondTo(raw){
+      var text = raw.toLowerCase();
+      for (var key in topics){
+        if (key === 'random') continue;
+        var t = topics[key];
+        for (var i = 0; i < t.keywords.length; i++){
+          if (text.indexOf(t.keywords[i]) !== -1){
+            addMsg(pick(t.replies), 'bot');
+            return;
+          }
+        }
+      }
+      addMsg(pick(fallbacks), 'bot');
+    }
+
+    function askTopic(key){
+      var t = topics[key];
+      if (!t) return;
+      addMsg(pick(t.replies), 'bot');
+    }
+
+    var greeted = false;
+    function openPanel(){
+      panel.classList.add('open');
+      launcher.setAttribute('aria-expanded', 'true');
+      if (!greeted){
+        addMsg("I'm Kacy. Balaji built the real me as a production AI assistant for his resume project — now I'm doing double duty as this site's guide. I only know a handful of topics, so pick a chip or ask directly.", 'bot');
+        greeted = true;
+      }
+      input.focus();
+    }
+    function closePanel(){
+      panel.classList.remove('open');
+      launcher.setAttribute('aria-expanded', 'false');
+    }
+
+    launcher.addEventListener('click', function(){
+      panel.classList.contains('open') ? closePanel() : openPanel();
+    });
+    closeBtn.addEventListener('click', closePanel);
+
+    chips.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var topic = btn.getAttribute('data-topic');
+        addMsg(btn.textContent, 'user');
+        askTopic(topic);
+      });
+    });
+
+    function sendCurrent(){
+      var val = input.value.trim();
+      if (!val) return;
+      addMsg(val, 'user');
+      respondTo(val);
+      input.value = '';
+    }
+    sendBtn.addEventListener('click', sendCurrent);
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') sendCurrent();
+    });
+  })();
+
+  // Scroll-driven 3D zoom + rotate on the hero portrait
+  (function(){
+    var frame = document.querySelector('.hero-media-frame');
+    var hero = document.querySelector('.hero');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!frame || !hero || reduceMotion) return;
+    var ticking = false;
+    function update(){
+      var rect = hero.getBoundingClientRect();
+      var span = rect.height || window.innerHeight;
+      var p = Math.min(Math.max((-rect.top) / span, 0), 1);
+      var scale = 1 + p * 0.3;
+      var rotY = p * 14;
+      var rotX = p * -6;
+      frame.style.transform = 'scale(' + scale.toFixed(3) + ') rotateY(' + rotY.toFixed(2) + 'deg) rotateX(' + rotX.toFixed(2) + 'deg)';
+      ticking = false;
+    }
+    function onScroll(){
+      if (!ticking){ requestAnimationFrame(update); ticking = true; }
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
 
   // Reveal sections on scroll
   (function(){
